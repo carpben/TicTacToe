@@ -114,12 +114,12 @@ console.log(model)
           }
         }
       }
-      if (board[2,2]=char){
-        if ((board[1,1]===char)&&(board[3,3])===char){
-          setResults([1,1],[2,2],[3,3])
+      if (board[1,1]===char){
+        if ((board[0,0]===char)&&(board[2,2])===char){
+          setResults([0,0],[1,1],[2,2])
           return
-        } else if ((board[3,1]===char)&&(board[1,3])) {
-          setResults ([3,1],[2,2],[1,3])
+        } else if ((board[2,0]===char)&&(board[0,2])) {
+          setResults ([2,0],[1,1],[0,2])
         }
       }
     }
