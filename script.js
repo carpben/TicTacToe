@@ -66,7 +66,7 @@ console.log(model)
     model.game.isPlayer1Next= !(model.game.isPlayer1Next)
   }
 
-  function getwinner(){
+  function checkResult(){
     if (model.game.move<5){
       return
     }
