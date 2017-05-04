@@ -14,6 +14,7 @@ function Board (options){
   }
 
   console.log(model)
+
   function initGame(){
     model.game= {
       _gameBoard: [
@@ -65,7 +66,7 @@ console.log(model)
     model.game.isPlayer1Next= !(model.game.isPlayer1Next)
   }
 
-  function checkResult(){
+  function getwinner(){
     if (model.game.move<5){
       return
     }
