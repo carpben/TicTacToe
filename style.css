@@ -1,0 +1,30 @@
+html, body {
+  background-color: black;
+  color:white;
+  display:flex;
+}
+#root {
+  margin:auto;
+  display: flex;
+  width: 480px;
+  height: 480px;
+}
+.cell {
+  display: inline-block;
+  border: 1px solid black;
+  width: 150px;
+  height: 150px;
+  background-color: white;
+  overflow: hidden;
+  color: black;
+  font-size: 100px;
+  text-align: center;
+}
+.row {
+}
+#view1 p {
+  display: block;
+}
+#view2 p {
+  display:block;
+}
