@@ -1,7 +1,11 @@
+const SYMOBlS = {
+  x:'X',
+  o:'O'
+}
 const RESULT = {
-  incomplete: 0,
-  player1Won: 1,
-  player2Won: 2,
+  incomplete: 0
+  playerXWon: SYMBOLS.x
+  playerOWon: SYMBOLS.o
   tie: 3
 }
 const VIEW = {
@@ -14,7 +18,6 @@ const VIEW = {
 function Board (options){
   model = {
     player2IsHuman:false,
-    symbolOptions: {x:'X', o:'O'},
     symbols: {
       player1: '',
       player2: ''
@@ -50,11 +53,12 @@ function Board (options){
       model.symbols.player2=(char==='X')? 'O': 'X';
     }
 
-  function applyMove(row, column, symbol){
-      if (!(model.game._gameBoard[row][column]==="")){
+  function applyMove(board, row, column, symbol){
+      if (!(board==="")){
         return
       }
-      model.game._gameBoard[row][column]= symbol
+      board[row][column]= symbol
+      return board
     }
 
     function setNextMove(){
@@ -62,23 +66,9 @@ function Board (options){
       model.game.isPlayer1Next= !(model.game.isPlayer1Next)
     }
 
-    function getComputerMove (){
-      console.log('getComputerMove S')
-      let row = 0
-      let column = 0;
-      do {
-        row = Math.floor( Math.random() * 3)
-        //let Math.floor(Math.random() * this.length)
-        column = Math.floor( Math.random() * 3)
-      } while (model.game._gameBoard[row][column]!="")
-      return {row,column}
-    }
-
-
-    function getResult(){
+    function getResult(board){
       // returns an object with the RESULT and an array of the winning line
       console.log('getResult S')
-      let board= model.game._gameBoard
       let winningLine
       let line
       let result
@@ -91,8 +81,8 @@ function Board (options){
       //first we check row, then column, then diagonal
       for (var i = 0 ; i<3 ; i++){
         line = board[i].join('')
-        if(line == 'XXX' || line == 'OOO'){
-          result = (line[0] === model.symbols.player1)? RESULT.player1Won : RESULT.player2Won;
+        if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
+          result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
           winningLine = [[i,0], [i,1], [i,2]]
           return {result, winningLine};
         }
@@ -101,8 +91,8 @@ function Board (options){
       for (var j=0 ; j<3; j++){
         let column = [board[0][j],board[1][j],board[2][j]]
         line = column.join('')
-        if(line == 'XXX' || line == 'OOO'){
-          result = (line[0] === model.symbols.player1)? RESULT.player1Won : RESULT.player2Won;
+        if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
+          result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
           winningLine = [[0,j], [1,j], [2,j]]
           return {result, winningLine};
         }
@@ -110,16 +100,16 @@ function Board (options){
 
       let diag1 = [board[0][0],board[1][1],board[2][2]]
       line = diag1.join('')
-      if(line == 'XXX' || line == 'OOO'){
-        result = (line[0] === model.symbols.player1)? RESULT.player1Won : RESULT.player2Won;
+      if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
+        result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
         winningLine = [[0,0], [1,1], [2,2]]
         return {result, winningLine};
       }
       let diag2 = [board[0][2],board[1][1],board[2][0]]
       line = diag2.join('')
-      if(line == 'XXX' || line == 'OOO'){
-        result = (line[0] === model.symbols.player1)? RESULT.player1Won : RESULT.player2Won;
-        winningLine = [[0,0], [1,1], [2,2]]
+      if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
+        result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
+        winningLine = [[2,2], [1,1], [0,0]]
         return {result, winningLine};
       }
 
@@ -131,6 +121,57 @@ function Board (options){
       result=RESULT.incomplete
       return {result}
     }
+
+function didPlayer1Win (player1Symbol, result){
+  let player1Symbol = player1Symbol || model.symbols.player1
+  result = result || model.game.result
+  let option1 = (result.result==RESULT.playerXWon && player1Symbol==SYMBOLS.x)
+  let option2 = (result.result==RESULT.playerOWon && player1Symbol==SYMBOLS.o)
+  return option1||option2
+}
+
+function getComputerMove (board){
+
+  function getboardscore(board, symbol){
+
+    let result = getResult(board){
+      if (result.re == RESULT.playerXWon){
+        return 1
+      }
+      if (result.result == RESULT.player1Won){
+        return -1
+      }
+      if (result.result == RESULT.tie){
+        return 0
+      }
+    }
+    let sum =
+    avaialableMoves=[]
+
+    if(get)
+
+  }
+
+  console.log('getComputerMove S')
+  let board = board || model.game._gameBoard.slice();
+  let availableMoves = []
+  let symbol = ""
+  for (let row = 0 ; row<3 ; row++){
+    for (let column = 0 ; column<3 ; column++){
+      if (board[row][column]==""){
+        availableMoves.push({row, column})
+      }
+    }
+  }
+  forRach (move=> {
+    board[move.row][move.column]
+    let result = getResult(board)
+  })
+
+
+
+  return {row,column}
+}
 
     function htmlQ1(){
       console.log('html1S')
@@ -159,10 +200,10 @@ function Board (options){
 
     function htmlResult (){
       console.log('html4S')
-      let resultText = "TIE"
+      let resultText = ""
       if (model.game.result.result==RESULT.tie){
         resultText = "TIE"
-      } else if (model.game.result.result==RESULT.player1Won){
+      } else if (didPlayer1Win()){
         resultText = "player 1 Won"
       } else {
         resultText =  model.player2IsHuman? "Player 2 Won" : "Computer Won"
@@ -205,7 +246,7 @@ function Board (options){
     let cell = getComputerMove()
     let symbol = (model.game.isPlayer1Next) ? model.symbols.player1 : model.symbols.player2;
     applyMove(cell.row, cell.column, symbol)
-    model.game.result = getResult()
+    model.game.result = getResult(model.game._gameBoard)
 
     if (model.game.result.result ==RESULT.incomplete){
       setNextMove()
@@ -220,8 +261,10 @@ function Board (options){
 
   function controlGame (ev){
     let symbol = (model.game.isPlayer1Next) ? model.symbols.player1 : model.symbols.player2;
-    applyMove($(ev.currentTarget).attr('data-row'),$(ev.currentTarget).attr('data-column'), symbol)
-    model.game.result = getResult()
+    let row = $(ev.currentTarget).attr('data-row')
+    let column = $(ev.currentTarget).attr('data-column')
+    applyMove(model.game._gameBoard, row, column, symbol)
+    model.game.result = getResult(model.game._gameBoard)
 
     if (model.game.result.result ==RESULT.incomplete){
       setNextMove()
