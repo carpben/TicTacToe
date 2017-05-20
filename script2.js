@@ -1,11 +1,11 @@
-const SYMOBlS = {
+const SYMBOLS = {
   x:'X',
   o:'O'
 }
 const RESULT = {
-  incomplete: 0
-  playerXWon: SYMBOLS.x
-  playerOWon: SYMBOLS.o
+  incomplete: 0,
+  playerXWon: SYMBOLS.x,
+  playerOWon: SYMBOLS.o,
   tie: 3
 }
 const VIEW = {
@@ -17,15 +17,18 @@ const VIEW = {
 
 function Board (options){
   model = {
-    player2IsHuman:false,
-    symbols: {
-      player1: '',
-      player2: ''
-    },
-    totalscore: {
-      player1: 0,
-      player2: 0
-    },
+    players: [
+      {
+        symbol: null,
+        isComputer: false,
+        score: 0
+      },
+      {
+        symbol: null,
+        isComputer: false,
+        score: 0
+      }
+    ]
   }
 
   function initGame(){
@@ -39,50 +42,27 @@ function Board (options){
         result: RESULT.incomplete,
         winningLine: null
       },
-      move: 1, //between 1 and 9
-      isPlayer1Next: Boolean(Math.round(Math.random())), //we set this var randomly for the first move.
+      turn: Math.round(Math.random()), //we set this var randomly for the first move.
     }
   }
 
-  function setSymbols(char){
-      //We can receive only x or 0. The input char will be used for player1, the other char by player2.
-      if (!char.match(/[XO]/)){
-        return ("The chosen char can only be X or O")
-      }
-      model.symbols.player1=char;
-      model.symbols.player2=(char==='X')? 'O': 'X';
-    }
-
-  function applyMove(board, row, column, symbol){
-      if (!(board==="")){
-        return
-      }
-      board[row][column]= symbol
-      return board
-    }
-
-    function setNextMove(){
-      model.game.move ++
-      model.game.isPlayer1Next= !(model.game.isPlayer1Next)
-    }
-
     function getResult(board){
       // returns an object with the RESULT and an array of the winning line
-      console.log('getResult S')
+      // console.log('getResult S')
       let winningLine
       let line
-      let result
+      let result = RESULT.tie
 
-      if (model.game.move<5){
-        result=RESULT.incomplete
-        return {result}
-      }
+      // if (model.game.move<5){
+      //   result=RESULT.incomplete
+      //   return {result}
+      // }
 
       //first we check row, then column, then diagonal
       for (var i = 0 ; i<3 ; i++){
         line = board[i].join('')
-        if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
-          result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
+        if(line === 'XXX' || line === 'OOO'){
+          result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerOWon;
           winningLine = [[i,0], [i,1], [i,2]]
           return {result, winningLine};
         }
@@ -91,8 +71,8 @@ function Board (options){
       for (var j=0 ; j<3; j++){
         let column = [board[0][j],board[1][j],board[2][j]]
         line = column.join('')
-        if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
-          result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
+        if(line == 'XXX' || line === 'OOO'){
+          result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerOWon;
           winningLine = [[0,j], [1,j], [2,j]]
           return {result, winningLine};
         }
@@ -100,195 +80,238 @@ function Board (options){
 
       let diag1 = [board[0][0],board[1][1],board[2][2]]
       line = diag1.join('')
-      if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
-        result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
+      if(line == 'XXX' || line === 'OOO'){
+        result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerOWon;
         winningLine = [[0,0], [1,1], [2,2]]
         return {result, winningLine};
       }
+
       let diag2 = [board[0][2],board[1][1],board[2][0]]
       line = diag2.join('')
-      if(line == SYMBOLS.x*3 || SYMBOLS.O*3){
-        result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerYWon;
+      if(line == 'XXX' || line === 'OOO'){
+        result = (line[0] === SYMBOLS.x)? RESULT.playerXWon : RESULT.playerOWon;
         winningLine = [[2,2], [1,1], [0,0]]
         return {result, winningLine};
       }
 
-      if (model.game.move==9){
-        result=RESULT.tie
-        return {result}
+      //Check for Incomplete
+      for (let row = 0 ; row<board.length ; row++){
+        for (let column = 0 ; column<board[row].length ; column++){
+          if (board[row][column]==""){
+            result = RESULT.incomplete
+            break;
+          }
+        }
       }
-
-      result=RESULT.incomplete
+      
       return {result}
     }
 
-function didPlayer1Win (player1Symbol, result){
-  let player1Symbol = player1Symbol || model.symbols.player1
-  result = result || model.game.result
-  let option1 = (result.result==RESULT.playerXWon && player1Symbol==SYMBOLS.x)
-  let option2 = (result.result==RESULT.playerOWon && player1Symbol==SYMBOLS.o)
-  return option1||option2
+// function didPlayer1Win (player1Symbol, result){
+//   let player1Symbol = player1Symbol || model.symbols.player1
+//   result = result || model.game.result
+//   let option1 = (result.result==RESULT.playerXWon && player1Symbol==SYMBOLS.x)
+//   let option2 = (result.result==RESULT.playerOWon && player1Symbol==SYMBOLS.o)
+//   return option1||option2
+// }
+
+function copyBoard(board) {
+  let copy = []
+   for (let row = 0 ; row<3 ; row++){
+    copy.push([])
+    for (let column = 0 ; column<3 ; column++){
+      copy[row][column] = board[row][column]
+    }
+  }
+  return copy
 }
 
-function getComputerMove (board){
+function getComputerMove (board) {
 
-  function getboardscore(board, symbol){
-
-    let result = getResult(board){
-      if (result.re == RESULT.playerXWon){
-        return 1
-      }
-      if (result.result == RESULT.player1Won){
-        return -1
-      }
-      if (result.result == RESULT.tie){
-        return 0
-      }
-    }
-    let sum =
-    avaialableMoves=[]
-
-    if(get)
-
-  }
-
-  console.log('getComputerMove S')
-  let board = board || model.game._gameBoard.slice();
   let availableMoves = []
-  let symbol = ""
+  let computerSymbol = model.players[1].symbol
+  let playerSymbol = model.players[0].symbol
+
   for (let row = 0 ; row<3 ; row++){
     for (let column = 0 ; column<3 ; column++){
-      if (board[row][column]==""){
-        availableMoves.push({row, column})
+      if (board[row][column]===""){
+        availableMoves.push({row, column, symbol: computerSymbol})
       }
     }
   }
-  forRach (move=> {
-    board[move.row][move.column]
-    let result = getResult(board)
+
+  let moveResults = availableMoves.map((move)=>{
+    let boardCopy = copyBoard(board)
+    boardCopy = applyMove(boardCopy,move)
+    let result = getResult(boardCopy).result
+    return {move,result}
   })
 
+  moveResults = moveResults.sort((move)=>{
+    if(move.result === computerSymbol)
+      return -1
+    else if(move.result === playerSymbol)
+      return 1
+    else
+      return 0
+  })
 
+  console.log(moveResults)
+  return moveResults[0].move
 
-  return {row,column}
 }
 
-    function htmlQ1(){
-      console.log('html1S')
-      const html1 = `<div id="view1"><p>Which do you prefer?\n</p>
-      <button class="buttons1" data="1player">Man Against computer</button>
-      <button class="buttons1" data="2players">Man Against Man</button>
-      </div>`
-      return html1
-    }
-    function htmlQ2(){
-      console.log('html2S')
-      const html2=`<div id="view2"><p>${model.player2IsHuman? "Player 1 - " : ""}Which symbols would you like to use?</p>
-      <button class="buttons2" data='X'>X</button>
-      <button class="buttons2" data='O'>O</button></div>`
-      return html2
-    }
-    function htmlGame (){
-      console.log('html3S')
-      let htmlBefore = `<p>move: ${model.game.move} &emsp; &ensp; turn: ${model.game.isPlayer1Next? 'Player 1' : model.player2IsHuman? 'Player2' : 'Computer'}</p>`
-      let board = model.game._gameBoard.reduce(function(acc,curr,rowIndex){
-          return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
-        }, ``)
-      let htmlAfter = `<p>Score: Player 1 - ${model.totalscore.player1} &emsp; &ensp; Player 2 - ${model.totalscore.player2}</p>`
-      return `<div id='gameView'> ${htmlBefore} <div id="board">${board}</div> ${htmlAfter} </div>`
-    }
 
-    function htmlResult (){
-      console.log('html4S')
-      let resultText = ""
-      if (model.game.result.result==RESULT.tie){
-        resultText = "TIE"
-      } else if (didPlayer1Win()){
-        resultText = "player 1 Won"
-      } else {
-        resultText =  model.player2IsHuman? "Player 2 Won" : "Computer Won"
-      }
-      let htmlBefore = `<p>${resultText} &emsp; &ensp; Click to restart game </p> `
-      let board = model.game._gameBoard.reduce(function(acc,curr,rowIndex){
-          return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
-        }, ``)
-      let htmlAfter = `<p>Score: Player 1 - ${model.totalscore.player1} &emsp; &ensp; Player 2 - ${model.totalscore.player2}</p>`
-      return `<div id='resultView'> ${htmlBefore} <div id="board">${board}</id> ${htmlAfter} </div>`
-    }
+function htmlQ1(){
+  // console.log('html1S')
+  const html1 = `<div id="view1"><p>Which do you prefer?\n</p>
+  <button class="buttons1" data="1player">Man Against computer</button>
+  <button class="buttons1" data="2players">Man Against Man</button>
+  </div>`
+  return html1
+}
 
-    function render(view){
-      console.log('renderS')
-      let html = ''
-      if (view == VIEW.question1) {html = htmlQ1()}
-      else if (view == VIEW.question2) {html = htmlQ2()}
-      else if (view == VIEW.result) {html=htmlResult()}
-      else {html=htmlGame()}
-      console.log(html)
-      options.el.innerHTML = html
-    }
+function htmlQ2(){
+  // console.log('html2S')
+  const html2=`<div id="view2"><p>${!model.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
+  <button class="buttons2" data='X'>X</button>
+  <button class="buttons2" data='O'>O</button></div>`
+  return html2
+}
+
+function htmlGame (){
+  // console.log('html3S')
+  //TODO: calculate moveNumber
+  let moveNumber = 1
+
+  let playerName = 'Computer'
+  if(!model.players[model.game.turn].isComputer)
+    playerName = model.game.turn === 0 ? 'Player1' : 'Player2'
+
+  let htmlBefore = `<p>move: ${moveNumber} &emsp; &ensp; turn: ${playerName}</p>`
+  let board = model.game._gameBoard.reduce(function(acc,curr,rowIndex){
+      return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
+    }, ``)
+  let htmlAfter = `<p>Score: Player 1 - ${model.players[0].score} &emsp; &ensp; Player 2 - ${model.players[1].score}</p>`
+  return `<div id='gameView'> ${htmlBefore} <div id="board">${board}</div> ${htmlAfter} </div>`
+}
+
+function getPlayerName(playerSymbol){
+  if(playerSymbol === model.players[0].symbol)
+    return model.players[0].isComputer ? 'Computer' : "Player1"
+  else
+    return model.players[1].isComputer ? 'Computer' : "Player2"
+}
+
+function htmlGameEnd (){
+  // console.log('html4S')
+  let {result, winningRow} = getResult(model.game._gameBoard)
+
+  let resultText = "tie"
+  if(result !== RESULT.tie)
+    resultText = getPlayerName(result) + " won"
 
 
-  function controlQuestion1 (ev){
-    model.player2IsHuman = ($(ev.currentTarget).attr('data')==="2players")
-    console.log(model)
-    render(VIEW.question2)
+  let htmlBefore = `<p>${resultText} &emsp; &ensp; Click to restart game </p> `
+  let board = model.game._gameBoard.reduce(function(acc,curr,rowIndex){
+      return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
+    }, ``)
+  let htmlAfter = `<p>Score: Player 1 - ${model.players[0].score} &emsp; &ensp; Player 2 - ${model.players[1].score}</p>`
+  return `<div id='resultView'> ${htmlBefore} <div id="board">${board}</id> ${htmlAfter} </div>`
+}
+
+function render(view){
+  // console.log('renderS')
+  let html = ''
+  if (view == VIEW.question1) {html = htmlQ1()}
+  else if (view == VIEW.question2) {html = htmlQ2()}
+  else if (view == VIEW.result) {html=htmlGameEnd()}
+  else {html=htmlGame()}
+  // console.log(html)
+  options.el.innerHTML = html
+}
+
+
+function question1Handler (ev){
+  model.players[1].isComputer = !($(ev.currentTarget).attr('data')==="2players")
+  render(VIEW.question2)
+}
+
+function question2Handler (ev){
+  let player1Symbol = $(ev.currentTarget).attr('data')
+  model.players[0].symbol=player1Symbol;
+  model.players[1].symbol=(player1Symbol===SYMBOLS.x)? SYMBOLS.o: SYMBOLS.x;
+
+  if(model.players[model.game.turn].isComputer)
+    doComputerMove()
+  
+  beginGame()
+}
+
+function doComputerMove (){
+  let move = getComputerMove(model.game._gameBoard)
+  executeTurn(model.game._gameBoard, move)
+}
+
+
+function playerMoveHandler (ev){
+  let symbol = model.players[model.game.turn].symbol
+  let row = parseInt($(ev.currentTarget).attr('data-row'))
+  let column = parseInt($(ev.currentTarget).attr('data-column')) 
+  executeTurn(model.game._gameBoard, {row, column, symbol})
+}
+
+function applyMove(board,move) {
+  if (board[move.row][move.column]!==""){
+    return board
   }
 
-  function controlQuestion2 (ev){
-    setSymbols($(ev.currentTarget).attr('data'))
+  board[move.row][move.column]= move.symbol
+  return board
+}
+
+function executeTurn(board, move) {
+  // applyMove(model.game._gameBoard, row, column, symbol)
+  applyMove(board,move)
+  
+  model.game.turn = (model.game.turn+1)%2
+  
+  let result = getResult(board).result
+
+  if (result === RESULT.incomplete){
     render(VIEW.game)
-    if (!model.game.isPlayer1Next && !model.player2IsHuman){
-      controlComputerMove()
-    }
   }
 
-  function controlComputerMove (){
-    let cell = getComputerMove()
-    let symbol = (model.game.isPlayer1Next) ? model.symbols.player1 : model.symbols.player2;
-    applyMove(cell.row, cell.column, symbol)
-    model.game.result = getResult(model.game._gameBoard)
-
-    if (model.game.result.result ==RESULT.incomplete){
-      setNextMove()
-      render(VIEW.game)
+  else {
+    //Increment score and show result
+    //MAGIC - translate symbol to player index
+    if(result !== RESULT.tie) {
+      let winningPlayer = model.players.find((player)=>{return player.symbol == result})
+      winningPlayer.score++
     }
-    else {
-      if (model.game.result.result==RESULT.player2Won) {model.totalscore.player2++}
-      render(VIEW.result)
-    }
+    
+    render(VIEW.result)
   }
 
-
-  function controlGame (ev){
-    let symbol = (model.game.isPlayer1Next) ? model.symbols.player1 : model.symbols.player2;
-    let row = $(ev.currentTarget).attr('data-row')
-    let column = $(ev.currentTarget).attr('data-column')
-    applyMove(model.game._gameBoard, row, column, symbol)
-    model.game.result = getResult(model.game._gameBoard)
-
-    if (model.game.result.result ==RESULT.incomplete){
-      setNextMove()
-      render(VIEW.game)
-    }
-    else {
-      if (model.game.result.result==RESULT.player1Won) {model.totalscore.player1++}
-      if (model.game.result.result==RESULT.player2Won) {model.totalscore.player2++}
-      render(VIEW.result)
-    }
-    if (!model.game.isPlayer1Next && !model.player2IsHuman){
-      controlComputerMove()
-    }
+  if (model.players[model.game.turn].isComputer){
+    doComputerMove()
   }
+}
 
-  function controlNewGame (){
-    initGame()
-    render(VIEW.game)
-  }
 
-  $(options.el).on('click', '.buttons1', controlQuestion1)
-  $(options.el).on('click', '.buttons2', controlQuestion2)
-  $(options.el).on('click', '#gameView .cell', controlGame)
-  $(options.el).on('click', '#resultView', controlNewGame)
+
+function beginGame(){
+  initGame()
+  render(VIEW.game)
+
+  if(model.game.turn === 1 && model.players[1].isComputer)
+    doComputerMove();
+}
+
+  $(options.el).on('click', '.buttons1', question1Handler)
+  $(options.el).on('click', '.buttons2', question2Handler)
+  $(options.el).on('click', '#gameView .cell', playerMoveHandler)
+  $(options.el).on('click', '#resultView', beginGame)
 
   initGame()
   render (VIEW.question1)
