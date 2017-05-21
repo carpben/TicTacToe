@@ -53,11 +53,6 @@ function Board (options){
       let line
       let result = RESULT.tie
 
-      // if (model.game.move<5){
-      //   result=RESULT.incomplete
-      //   return {result}
-      // }
-
       //first we check row, then column, then diagonal
       for (var i = 0 ; i<3 ; i++){
         line = board[i].join('')
@@ -103,17 +98,9 @@ function Board (options){
           }
         }
       }
-      
+
       return {result}
     }
-
-// function didPlayer1Win (player1Symbol, result){
-//   let player1Symbol = player1Symbol || model.symbols.player1
-//   result = result || model.game.result
-//   let option1 = (result.result==RESULT.playerXWon && player1Symbol==SYMBOLS.x)
-//   let option2 = (result.result==RESULT.playerOWon && player1Symbol==SYMBOLS.o)
-//   return option1||option2
-// }
 
 function copyBoard(board) {
   let copy = []
@@ -140,24 +127,24 @@ function getComputerMove (board) {
     }
   }
 
-  let moveResults = availableMoves.map((move)=>{
+  let availableMovesResults = availableMoves.map((move)=>{
     let boardCopy = copyBoard(board)
     boardCopy = applyMove(boardCopy,move)
     let result = getResult(boardCopy).result
-    return {move,result}
+    let score = 0
+    if(result === computerSymbol)
+      score = 1
+    else if(result === playerSymbol)
+      score = -1
+    return {move,score}
   })
 
-  moveResults = moveResults.sort((move)=>{
-    if(move.result === computerSymbol)
-      return -1
-    else if(move.result === playerSymbol)
-      return 1
-    else
-      return 0
+  availableMovesResults = availableMovesResults.sort((moveA, moveB )=>{
+    return moveB.score - moveA.score
   })
 
-  console.log(moveResults)
-  return moveResults[0].move
+  console.log(availableMovesResults)
+  return availableMovesResults[0].move
 
 }
 
@@ -181,8 +168,17 @@ function htmlQ2(){
 
 function htmlGame (){
   // console.log('html3S')
+
   //TODO: calculate moveNumber
+  let boardPtr = model.game._gameBoard
   let moveNumber = 1
+  for (let i = 0; i<boardPtr.length; i++){
+    for (let j = 0 ; j<boardPtr[i].length ; j++){
+      if (boardPtr[i][j]!=""){
+        moveNumber++
+      }
+    }
+  }
 
   let playerName = 'Computer'
   if(!model.players[model.game.turn].isComputer)
@@ -242,10 +238,11 @@ function question2Handler (ev){
   model.players[0].symbol=player1Symbol;
   model.players[1].symbol=(player1Symbol===SYMBOLS.x)? SYMBOLS.o: SYMBOLS.x;
 
+  initGame()
   if(model.players[model.game.turn].isComputer)
     doComputerMove()
-  
-  beginGame()
+
+  render(VIEW.game)
 }
 
 function doComputerMove (){
@@ -257,14 +254,12 @@ function doComputerMove (){
 function playerMoveHandler (ev){
   let symbol = model.players[model.game.turn].symbol
   let row = parseInt($(ev.currentTarget).attr('data-row'))
-  let column = parseInt($(ev.currentTarget).attr('data-column')) 
+  let column = parseInt($(ev.currentTarget).attr('data-column'))
   executeTurn(model.game._gameBoard, {row, column, symbol})
 }
 
 function applyMove(board,move) {
-  if (board[move.row][move.column]!==""){
-    return board
-  }
+
 
   board[move.row][move.column]= move.symbol
   return board
@@ -272,10 +267,13 @@ function applyMove(board,move) {
 
 function executeTurn(board, move) {
   // applyMove(model.game._gameBoard, row, column, symbol)
+  if (board[move.row][move.column]!==""){
+    return board
+  }
   applyMove(board,move)
-  
+
   model.game.turn = (model.game.turn+1)%2
-  
+
   let result = getResult(board).result
 
   if (result === RESULT.incomplete){
@@ -289,7 +287,7 @@ function executeTurn(board, move) {
       let winningPlayer = model.players.find((player)=>{return player.symbol == result})
       winningPlayer.score++
     }
-    
+
     render(VIEW.result)
   }
 
@@ -313,7 +311,6 @@ function beginGame(){
   $(options.el).on('click', '#gameView .cell', playerMoveHandler)
   $(options.el).on('click', '#resultView', beginGame)
 
-  initGame()
   render (VIEW.question1)
 }
 
