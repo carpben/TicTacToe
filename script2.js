@@ -16,7 +16,7 @@ const VIEW = {
 }
 
 function Board (options){
-  model = {
+  state = {
     players: [
       {
         symbol: null,
@@ -32,7 +32,7 @@ function Board (options){
   }
 
   function initGame(){
-    model.game= {
+    state.game= {
       _gameBoard: [
         ["", "", ""],
         ["", "", ""],
@@ -113,40 +113,112 @@ function copyBoard(board) {
   return copy
 }
 
-function getComputerMove (board) {
+function getBestMove (board, symbol){
+  function getAvailableMoves (board) {
+    let availableMoves = []
 
-  let availableMoves = []
-  let computerSymbol = model.players[1].symbol
-  let playerSymbol = model.players[0].symbol
-
-  for (let row = 0 ; row<3 ; row++){
-    for (let column = 0 ; column<3 ; column++){
-      if (board[row][column]===""){
-        availableMoves.push({row, column, symbol: computerSymbol})
+    for (let row = 0 ; row<3 ; row++){
+      for (let column = 0 ; column<3 ; column++){
+        if (board[row][column]===""){
+          availableMoves.push({row, column})
+        }
       }
     }
+    return availableMoves
   }
 
-  let availableMovesResults = availableMoves.map((move)=>{
-    let boardCopy = copyBoard(board)
-    boardCopy = applyMove(boardCopy,move)
-    let result = getResult(boardCopy).result
-    let score = 0
-    if(result === computerSymbol)
-      score = 1
-    else if(result === playerSymbol)
-      score = -1
-    return {move,score}
+  let availableMoves = getAvailableMoves(board)
+  console.log(availableMoves)
+  let availableMovesAndScores = availableMoves.map(availableMove => {
+    let newBoard = copyBoard(board)
+    newBoard = applyMove(newBoard,availableMove, symbol)
+    result = getResult(newBoard).result
+    let score
+    if (result == RESULT.tie) {score = 0}
+    else if (result == symbol) {score = 1}
+    else {
+      let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
+      nextMove = getBestMove(newBoard, otherSymbol)
+      score = - nextMove.score
+    }
+    return {availableMove, score}
   })
+  console.log(availableMovesAndScores)
+  availableMovesAndScores.sort((moveA, moveB )=>{
+      return moveB.score - moveA.score
+    })
+  console.log(availableMovesAndScores)
 
-  availableMovesResults = availableMovesResults.sort((moveA, moveB )=>{
-    return moveB.score - moveA.score
-  })
-
-  console.log(availableMovesResults)
-  return availableMovesResults[0].move
-
+  return availalbeMovesAndScores[0]
 }
+
+
+// function getComputerMove (board) {
+
+  // let computerSymbol = state.players[1].symbol
+  // let playerSymbol = state.players[0].symbol
+  //
+  // function getAvailableMoves (board) {
+  //   let availableMoves = []
+  //
+  //   for (let row = 0 ; row<3 ; row++){
+  //     for (let column = 0 ; column<3 ; column++){
+  //       if (board[row][column]===""){
+  //         availableMoves.push({row, column, symbol: computerSymbol})
+  //       }
+  //     }
+  //   }
+  //   return availableMoves
+  // }
+  //
+  // function getBestMove(board,symbol,alpha){
+  //   let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
+  //   let availableMoves = getAvailableMoves(board,symbol)
+  //   console.log('availablemove count ', availableMoves.length)
+  //   let availableMovesResults = availableMoves.map((move)=>{
+  //     let boardCopy = copyBoard(board)
+  //     boardCopy = applyMove(boardCopy,move)
+  //     let alphaMult = alpha ? 1 : -1
+  //     let score = getBoardScore(boardCopy, move.symbol) & alphaMult
+  //
+  //     if(score === 0 && getResult(boardCopy).result !== RESULT.tie)
+  //       return getBestMove(boardCopy,otherSymbol,!alpha)
+  //     return {move,score}
+  //   })
+  //   availableMovesResults = availableMovesResults.sort((moveA, moveB )=>{
+  //     return moveB.score - moveA.score
+  //   })
+  //
+  //   return availableMovesResults[0].move
+
+    //get all moves
+    //create a board for each move
+    //if(score 1) return move
+    //else if (getBestMove othersymbol)
+    //get all moves for each new board
+    //create a board for eamve
+  // }
+  //
+  // function getBoardScore (board,symbol){
+  //   let result = getResult(board).result
+  //   let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
+  //   let score = 0
+  //   if(result === symbol)
+  //     score = 1
+  //   else if(result === otherSymbol )
+  //     score = -1
+  //   return score
+  // }
+
+  // let availableMovesResults = availableMoves.map((move)=>{
+  //   let boardCopy = copyBoard(board)
+  //   boardCopy = applyMove(boardCopy,move)
+  //   let score = getBoardScore(boardCopy, move.symbol)
+  //   return {move,score}
+  // })
+
+  // return getBestMove(board, computerSymbol, true)
+// }
 
 
 function htmlQ1(){
@@ -160,7 +232,7 @@ function htmlQ1(){
 
 function htmlQ2(){
   // console.log('html2S')
-  const html2=`<div id="view2"><p>${!model.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
+  const html2=`<div id="view2"><p>${!state.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
   <button class="buttons2" data='X'>X</button>
   <button class="buttons2" data='O'>O</button></div>`
   return html2
@@ -170,7 +242,7 @@ function htmlGame (){
   // console.log('html3S')
 
   //TODO: calculate moveNumber
-  let boardPtr = model.game._gameBoard
+  let boardPtr = state.game._gameBoard
   let moveNumber = 1
   for (let i = 0; i<boardPtr.length; i++){
     for (let j = 0 ; j<boardPtr[i].length ; j++){
@@ -181,27 +253,27 @@ function htmlGame (){
   }
 
   let playerName = 'Computer'
-  if(!model.players[model.game.turn].isComputer)
-    playerName = model.game.turn === 0 ? 'Player1' : 'Player2'
+  if(!state.players[state.game.turn].isComputer)
+    playerName = state.game.turn === 0 ? 'Player1' : 'Player2'
 
   let htmlBefore = `<p>move: ${moveNumber} &emsp; &ensp; turn: ${playerName}</p>`
-  let board = model.game._gameBoard.reduce(function(acc,curr,rowIndex){
+  let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
       return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
     }, ``)
-  let htmlAfter = `<p>Score: Player 1 - ${model.players[0].score} &emsp; &ensp; Player 2 - ${model.players[1].score}</p>`
+  let htmlAfter = `<p>Score: Player 1 - ${state.players[0].score} &emsp; &ensp; Player 2 - ${state.players[1].score}</p>`
   return `<div id='gameView'> ${htmlBefore} <div id="board">${board}</div> ${htmlAfter} </div>`
 }
 
 function getPlayerName(playerSymbol){
-  if(playerSymbol === model.players[0].symbol)
-    return model.players[0].isComputer ? 'Computer' : "Player1"
+  if(playerSymbol === state.players[0].symbol)
+    return state.players[0].isComputer ? 'Computer' : "Player1"
   else
-    return model.players[1].isComputer ? 'Computer' : "Player2"
+    return state.players[1].isComputer ? 'Computer' : "Player2"
 }
 
 function htmlGameEnd (){
   // console.log('html4S')
-  let {result, winningRow} = getResult(model.game._gameBoard)
+  let {result, winningRow} = getResult(state.game._gameBoard)
 
   let resultText = "tie"
   if(result !== RESULT.tie)
@@ -209,10 +281,10 @@ function htmlGameEnd (){
 
 
   let htmlBefore = `<p>${resultText} &emsp; &ensp; Click to restart game </p> `
-  let board = model.game._gameBoard.reduce(function(acc,curr,rowIndex){
+  let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
       return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
     }, ``)
-  let htmlAfter = `<p>Score: Player 1 - ${model.players[0].score} &emsp; &ensp; Player 2 - ${model.players[1].score}</p>`
+  let htmlAfter = `<p>Score: Player 1 - ${state.players[0].score} &emsp; &ensp; Player 2 - ${state.players[1].score}</p>`
   return `<div id='resultView'> ${htmlBefore} <div id="board">${board}</id> ${htmlAfter} </div>`
 }
 
@@ -229,50 +301,49 @@ function render(view){
 
 
 function question1Handler (ev){
-  model.players[1].isComputer = !($(ev.currentTarget).attr('data')==="2players")
+  state.players[1].isComputer = !($(ev.currentTarget).attr('data')==="2players")
   render(VIEW.question2)
 }
 
 function question2Handler (ev){
   let player1Symbol = $(ev.currentTarget).attr('data')
-  model.players[0].symbol=player1Symbol;
-  model.players[1].symbol=(player1Symbol===SYMBOLS.x)? SYMBOLS.o: SYMBOLS.x;
+  state.players[0].symbol=player1Symbol;
+  state.players[1].symbol=(player1Symbol===SYMBOLS.x)? SYMBOLS.o: SYMBOLS.x;
 
   initGame()
-  if(model.players[model.game.turn].isComputer)
+  if(state.players[state.game.turn].isComputer)
     doComputerMove()
 
   render(VIEW.game)
 }
 
 function doComputerMove (){
-  let move = getComputerMove(model.game._gameBoard)
-  executeTurn(model.game._gameBoard, move)
+  let symbol = state.players[1].symbol
+  let move = getBestMove(state.game._gameBoard, symbol)
+  executeTurn(state.game._gameBoard, symbol)
 }
 
 
 function playerMoveHandler (ev){
-  let symbol = model.players[model.game.turn].symbol
+  let symbol = state.players[state.game.turn].symbol
   let row = parseInt($(ev.currentTarget).attr('data-row'))
   let column = parseInt($(ev.currentTarget).attr('data-column'))
-  executeTurn(model.game._gameBoard, {row, column, symbol})
+  executeTurn(state.game._gameBoard, {row, column}, symbol)
 }
 
-function applyMove(board,move) {
-
-
-  board[move.row][move.column]= move.symbol
+function applyMove(board,move, symbol) {
+  board[move.row][move.column]= symbol
   return board
 }
 
-function executeTurn(board, move) {
-  // applyMove(model.game._gameBoard, row, column, symbol)
+function executeTurn(board, move, symbol) {
+  // applyMove(state.game._gameBoard, row, column, symbol)
   if (board[move.row][move.column]!==""){
     return board
   }
-  applyMove(board,move)
+  applyMove(board,move,symbol)
 
-  model.game.turn = (model.game.turn+1)%2
+  state.game.turn = (state.game.turn+1)%2
 
   let result = getResult(board).result
 
@@ -284,14 +355,14 @@ function executeTurn(board, move) {
     //Increment score and show result
     //MAGIC - translate symbol to player index
     if(result !== RESULT.tie) {
-      let winningPlayer = model.players.find((player)=>{return player.symbol == result})
+      let winningPlayer = state.players.find((player)=>{return player.symbol == result})
       winningPlayer.score++
     }
 
     render(VIEW.result)
   }
 
-  if (model.players[model.game.turn].isComputer){
+  if (state.players[state.game.turn].isComputer){
     doComputerMove()
   }
 }
@@ -302,7 +373,7 @@ function beginGame(){
   initGame()
   render(VIEW.game)
 
-  if(model.game.turn === 1 && model.players[1].isComputer)
+  if(state.game.turn === 1 && state.players[1].isComputer)
     doComputerMove();
 }
 
