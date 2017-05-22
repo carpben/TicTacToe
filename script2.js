@@ -129,9 +129,9 @@ function getBestMove (board, symbol){
 
   let availableMoves = getAvailableMoves(board)
   console.log(availableMoves)
-  let availableMovesAndScores = availableMoves.map(availableMove => {
+  let availableMovesAndScores = availableMoves.map(move => {
     let newBoard = copyBoard(board)
-    newBoard = applyMove(newBoard,availableMove, symbol)
+    newBoard = applyMove(newBoard,move, symbol)
     result = getResult(newBoard).result
     let score
     if (result == RESULT.tie) {score = 0}
@@ -141,13 +141,14 @@ function getBestMove (board, symbol){
       nextMove = getBestMove(newBoard, otherSymbol)
       score = - (nextMove.score)
     }
-    return {availableMove, score}
+    return {move, score}
   })
   availableMovesAndScores.sort((moveA, moveB )=>{
       return moveB.score - moveA.score
     })
   console.log(availableMovesAndScores)
-  console.log(availableMovesAndScores[0])
+
+  console.log(availableMovesAndScores[0] , symbol)
   return availableMovesAndScores[0]
 }
 
@@ -318,8 +319,8 @@ function question2Handler (ev){
 
 function doComputerMove (){
   let symbol = state.players[1].symbol
-  let move = getBestMove(state.game._gameBoard, symbol)
-  executeTurn(state.game._gameBoard, symbol)
+  let move = getBestMove(state.game._gameBoard, symbol).move
+  executeTurn(state.game._gameBoard,move, symbol)
 }
 
 
