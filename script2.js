@@ -139,17 +139,16 @@ function getBestMove (board, symbol){
     else {
       let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
       nextMove = getBestMove(newBoard, otherSymbol)
-      score = - nextMove.score
+      score = - (nextMove.score)
     }
     return {availableMove, score}
   })
-  console.log(availableMovesAndScores)
   availableMovesAndScores.sort((moveA, moveB )=>{
       return moveB.score - moveA.score
     })
   console.log(availableMovesAndScores)
-
-  return availalbeMovesAndScores[0]
+  console.log(availableMovesAndScores[0])
+  return availableMovesAndScores[0]
 }
 
 
