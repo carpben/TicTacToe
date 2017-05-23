@@ -116,7 +116,6 @@ function copyBoard(board) {
 function getBestMove (board, symbol){
   function getAvailableMoves (board) {
     let availableMoves = []
-
     for (let row = 0 ; row<3 ; row++){
       for (let column = 0 ; column<3 ; column++){
         if (board[row][column]===""){
@@ -129,20 +128,45 @@ function getBestMove (board, symbol){
 
   let availableMoves = getAvailableMoves(board)
   console.log(availableMoves)
-  let availableMovesAndScores = availableMoves.map(move => {
+
+  let availableMovesAndScores = []
+
+  for (var i=0 ; i<availableMoves.length ; i++){
+    let move = availableMoves[i]
     let newBoard = copyBoard(board)
     newBoard = applyMove(newBoard,move, symbol)
     result = getResult(newBoard).result
     let score
     if (result == RESULT.tie) {score = 0}
-    else if (result == symbol) {score = 1}
+    else if (result == symbol) {
+      score = 1
+    }
     else {
       let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
       nextMove = getBestMove(newBoard, otherSymbol)
       score = - (nextMove.score)
     }
-    return {move, score}
-  })
+    availableMovesAndScores.push({move, score})
+    if (score == 1){break}
+  }
+
+
+  // availableMoves.map(move => {
+  //   let newBoard = copyBoard(board)
+  //   newBoard = applyMove(newBoard,move, symbol)
+  //   result = getResult(newBoard).result
+  //   let score
+  //   if (result == RESULT.tie) {score = 0}
+  //   else if (result == symbol) {
+  //     score = 1
+  //   }
+  //   else {
+  //     let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
+  //     nextMove = getBestMove(newBoard, otherSymbol)
+  //     score = - (nextMove.score)
+  //   }
+  //   return {move, score}
+  // })
   availableMovesAndScores.sort((moveA, moveB )=>{
       return moveB.score - moveA.score
     })
