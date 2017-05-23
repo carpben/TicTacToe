@@ -1,14 +1,19 @@
 html, body {
   background-color: black;
-  color:white;
+  color: white;
+  width: 100%;
   display:flex;
+
 }
+
 #root {
   margin:auto;
-  display: flex;
-  width: 480px;
-  height: 480px;
 }
+
+button {
+  color:black;
+}
+
 .cell {
   display: inline-block;
   border: 1px solid black;
@@ -19,12 +24,4 @@ html, body {
   color: black;
   font-size: 100px;
   text-align: center;
-}
-.row {
-}
-#view1 p {
-  display: block;
-}
-#view2 p {
-  display:block;
 }

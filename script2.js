@@ -248,8 +248,8 @@ function getBestMove (board, symbol){
 function htmlQ1(){
   // console.log('html1S')
   const html1 = `<div id="view1"><p>Which do you prefer?\n</p>
-  <button class="buttons1" data="1player">Man Against computer</button>
-  <button class="buttons1" data="2players">Man Against Man</button>
+  <button class="buttons1 btn-default" data="1player">Man Against computer</button>
+  <button class="buttons1 btn-default" data="2players">Man Against Man</button>
   </div>`
   return html1
 }
@@ -257,8 +257,8 @@ function htmlQ1(){
 function htmlQ2(){
   // console.log('html2S')
   const html2=`<div id="view2"><p>${!state.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
-  <button class="buttons2" data='X'>X</button>
-  <button class="buttons2" data='O'>O</button></div>`
+  <button class="buttons2 btn-default" data='X'>X</button>
+  <button class="buttons2 btn-default" data='O'>O</button></div>`
   return html2
 }
 
