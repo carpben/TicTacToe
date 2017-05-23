@@ -244,21 +244,27 @@ function getBestMove (board, symbol){
   // return getBestMove(board, computerSymbol, true)
 // }
 
+function buttonHTML(btnGroup, data, text){
+  return `<button type="button" class="btn btn-default btnGroup${btnGroup}" data=${data}>${text}</button>`
+}
 
 function htmlQ1(){
   // console.log('html1S')
-  const html1 = `<div id="view1"><p>Which do you prefer?\n</p>
-  <button class="buttons1 btn-default" data="1player">Man Against computer</button>
-  <button class="buttons1 btn-default" data="2players">Man Against Man</button>
+  return `<div id="view1"><p>Which do you prefer?\n</p>
+  ${buttonHTML(1, "1player", "Man Against computer")}
+  ${buttonHTML(1, "2players", "Man Against Man")}
   </div>`
-  return html1
+  // <button type="button"class="buttons1 btn-default" data="1player">Man Against computer</button>
+  // <button class="buttons1 btn-default" data="2players">Man Against Man</button>
 }
 
 function htmlQ2(){
   // console.log('html2S')
   const html2=`<div id="view2"><p>${!state.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
-  <button class="buttons2 btn-default" data='X'>X</button>
-  <button class="buttons2 btn-default" data='O'>O</button></div>`
+  ${buttonHTML(2, "X", "X")}
+  ${buttonHTML(2, "O", "O")}`
+  // <button class="buttons2 btn-default" data='X'>X</button>
+  // <button class="buttons2 btn-default" data='O'>O</button></div>`
   return html2
 }
 
@@ -401,8 +407,8 @@ function beginGame(){
     doComputerMove();
 }
 
-  $(options.el).on('click', '.buttons1', question1Handler)
-  $(options.el).on('click', '.buttons2', question2Handler)
+  $(options.el).on('click', '.btnGroup1', question1Handler)
+  $(options.el).on('click', '.btnGroup2', question2Handler)
   $(options.el).on('click', '#gameView .cell', playerMoveHandler)
   $(options.el).on('click', '#resultView', beginGame)
 

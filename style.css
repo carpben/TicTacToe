@@ -11,9 +11,14 @@ html, body {
 }
 
 button {
-  color:black;
+  background-color: white !important;
+  color:black !important;
 }
 
+#gameView p, #resultView p  {
+  margin: 1em auto;
+
+}
 .cell {
   display: inline-block;
   border: 1px solid black;
