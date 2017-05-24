@@ -1,3 +1,4 @@
+//----  Definitions  -----------------------------------------------------------------
 window.getResultCount = 0
 window.getBestMoveCount = 0
 const SYMBOLS = {
@@ -18,6 +19,7 @@ const VIEW = {
 }
 
 function Board (options){
+  //----  State  -----------------------------------------------------------------
   state = {
     players: [
       {
@@ -48,10 +50,10 @@ function Board (options){
     }
   }
 
+
     function getResult(board){
       getResultCount++
       // returns an object with the RESULT and an array of the winning line
-      // console.log('getResult S')
       let winningLine
       let line
       let result = RESULT.tie
@@ -131,7 +133,6 @@ function getBestMove (board, symbol){
   }
 
   let availableMoves = getAvailableMoves(board)
-  //console.log(availableMoves)
 
   let availableMovesAndScores = []
 
@@ -153,131 +154,41 @@ function getBestMove (board, symbol){
     if(score === 1)
       return {move, score}
     availableMovesAndScores.push({move, score})
-    // if (score == 1){break}
   }
 
-
-  // availableMoves.map(move => {
-  //   let newBoard = copyBoard(board)
-  //   newBoard = applyMove(newBoard,move, symbol)
-  //   result = getResult(newBoard).result
-  //   let score
-  //   if (result == RESULT.tie) {score = 0}
-  //   else if (result == symbol) {
-  //     score = 1
-  //   }
-  //   else {
-  //     let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
-  //     nextMove = getBestMove(newBoard, otherSymbol)
-  //     score = - (nextMove.score)
-  //   }
-  //   return {move, score}
-  // })
   availableMovesAndScores.sort((moveA, moveB )=>{
       return moveB.score - moveA.score
     })
-  //console.log(availableMovesAndScores)
-
-  //console.log(availableMovesAndScores[0] , symbol)
   return availableMovesAndScores[0]
 }
 
-
-// function getComputerMove (board) {
-
-  // let computerSymbol = state.players[1].symbol
-  // let playerSymbol = state.players[0].symbol
-  //
-  // function getAvailableMoves (board) {
-  //   let availableMoves = []
-  //
-  //   for (let row = 0 ; row<3 ; row++){
-  //     for (let column = 0 ; column<3 ; column++){
-  //       if (board[row][column]===""){
-  //         availableMoves.push({row, column, symbol: computerSymbol})
-  //       }
-  //     }
-  //   }
-  //   return availableMoves
-  // }
-  //
-  // function getBestMove(board,symbol,alpha){
-  //   let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
-  //   let availableMoves = getAvailableMoves(board,symbol)
-  //   console.log('availablemove count ', availableMoves.length)
-  //   let availableMovesResults = availableMoves.map((move)=>{
-  //     let boardCopy = copyBoard(board)
-  //     boardCopy = applyMove(boardCopy,move)
-  //     let alphaMult = alpha ? 1 : -1
-  //     let score = getBoardScore(boardCopy, move.symbol) & alphaMult
-  //
-  //     if(score === 0 && getResult(boardCopy).result !== RESULT.tie)
-  //       return getBestMove(boardCopy,otherSymbol,!alpha)
-  //     return {move,score}
-  //   })
-  //   availableMovesResults = availableMovesResults.sort((moveA, moveB )=>{
-  //     return moveB.score - moveA.score
-  //   })
-  //
-  //   return availableMovesResults[0].move
-
-    //get all moves
-    //create a board for each move
-    //if(score 1) return move
-    //else if (getBestMove othersymbol)
-    //get all moves for each new board
-    //create a board for eamve
-  // }
-  //
-  // function getBoardScore (board,symbol){
-  //   let result = getResult(board).result
-  //   let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
-  //   let score = 0
-  //   if(result === symbol)
-  //     score = 1
-  //   else if(result === otherSymbol )
-  //     score = -1
-  //   return score
-  // }
-
-  // let availableMovesResults = availableMoves.map((move)=>{
-  //   let boardCopy = copyBoard(board)
-  //   boardCopy = applyMove(boardCopy,move)
-  //   let score = getBoardScore(boardCopy, move.symbol)
-  //   return {move,score}
-  // })
-
-  // return getBestMove(board, computerSymbol, true)
-// }
+//----  VIEW  -----------------------------------------------------------------
+function getPlayerName(playerSymbol){
+  if(playerSymbol === state.players[0].symbol)
+    return state.players[0].isComputer ? 'Computer' : "Player1"
+  else
+    return state.players[1].isComputer ? 'Computer' : "Player2"
+}
 
 function buttonHTML(btnGroup, data, text){
   return `<button type="button" class="btn btn-default btnGroup${btnGroup}" data=${data}>${text}</button>`
 }
 
 function htmlQ1(){
-  // console.log('html1S')
   return `<div id="view1"><p>Which do you prefer?\n</p>
   ${buttonHTML(1, "1player", "Man Against computer")}
   ${buttonHTML(1, "2players", "Man Against Man")}
   </div>`
-  // <button type="button"class="buttons1 btn-default" data="1player">Man Against computer</button>
-  // <button class="buttons1 btn-default" data="2players">Man Against Man</button>
 }
 
 function htmlQ2(){
-  // console.log('html2S')
   const html2=`<div id="view2"><p>${!state.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
   ${buttonHTML(2, "X", "X")}
   ${buttonHTML(2, "O", "O")}`
-  // <button class="buttons2 btn-default" data='X'>X</button>
-  // <button class="buttons2 btn-default" data='O'>O</button></div>`
   return html2
 }
 
 function htmlGame (){
-  // console.log('html3S')
-
-  //TODO: calculate moveNumber
   let boardPtr = state.game._gameBoard
   let moveNumber = 1
   for (let i = 0; i<boardPtr.length; i++){
@@ -300,15 +211,7 @@ function htmlGame (){
   return `<div id='gameView'> ${htmlBefore} <div id="board">${board}</div> ${htmlAfter} </div>`
 }
 
-function getPlayerName(playerSymbol){
-  if(playerSymbol === state.players[0].symbol)
-    return state.players[0].isComputer ? 'Computer' : "Player1"
-  else
-    return state.players[1].isComputer ? 'Computer' : "Player2"
-}
-
 function htmlGameEnd (){
-  // console.log('html4S')
   let {result, winningRow} = getResult(state.game._gameBoard)
 
   let resultText = "tie"
@@ -359,7 +262,6 @@ function doComputerMove (){
   executeTurn(state.game._gameBoard,move, symbol)
 }
 
-
 function playerMoveHandler (ev){
   let symbol = state.players[state.game.turn].symbol
   let row = parseInt($(ev.currentTarget).attr('data-row'))
@@ -373,23 +275,18 @@ function applyMove(board,move, symbol) {
 }
 
 function executeTurn(board, move, symbol) {
-  // applyMove(state.game._gameBoard, row, column, symbol)
   if (board[move.row][move.column]!==""){
     return board
   }
+
   applyMove(board,move,symbol)
-
   state.game.turn = (state.game.turn+1)%2
-
   let result = getResult(board).result
 
   if (result === RESULT.incomplete){
     render(VIEW.game)
-  }
-
-  else {
+  } else {
     //Increment score and show result
-    //MAGIC - translate symbol to player index
     if(result !== RESULT.tie) {
       let winningPlayer = state.players.find((player)=>{return player.symbol == result})
       winningPlayer.score++
@@ -403,12 +300,9 @@ function executeTurn(board, move, symbol) {
   }
 }
 
-
-
 function beginGame(){
   initGame()
   render(VIEW.game)
-
   if(state.game.turn === 1 && state.players[1].isComputer)
     doComputerMove();
 }
@@ -420,7 +314,6 @@ function beginGame(){
 
   render (VIEW.question1)
 }
-
 
 
 const board = new Board ({
