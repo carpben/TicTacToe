@@ -1,3 +1,5 @@
+window.getResultCount = 0
+window.getBestMoveCount = 0
 const SYMBOLS = {
   x:'X',
   o:'O'
@@ -47,6 +49,7 @@ function Board (options){
   }
 
     function getResult(board){
+      getResultCount++
       // returns an object with the RESULT and an array of the winning line
       // console.log('getResult S')
       let winningLine
@@ -114,6 +117,7 @@ function copyBoard(board) {
 }
 
 function getBestMove (board, symbol){
+  getBestMoveCount++
   function getAvailableMoves (board) {
     let availableMoves = []
     for (let row = 0 ; row<3 ; row++){
@@ -127,7 +131,7 @@ function getBestMove (board, symbol){
   }
 
   let availableMoves = getAvailableMoves(board)
-  console.log(availableMoves)
+  //console.log(availableMoves)
 
   let availableMovesAndScores = []
 
@@ -146,8 +150,10 @@ function getBestMove (board, symbol){
       nextMove = getBestMove(newBoard, otherSymbol)
       score = - (nextMove.score)
     }
+    if(score === 1)
+      return {move, score}
     availableMovesAndScores.push({move, score})
-    if (score == 1){break}
+    // if (score == 1){break}
   }
 
 
@@ -170,9 +176,9 @@ function getBestMove (board, symbol){
   availableMovesAndScores.sort((moveA, moveB )=>{
       return moveB.score - moveA.score
     })
-  console.log(availableMovesAndScores)
+  //console.log(availableMovesAndScores)
 
-  console.log(availableMovesAndScores[0] , symbol)
+  //console.log(availableMovesAndScores[0] , symbol)
   return availableMovesAndScores[0]
 }
 
