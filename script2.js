@@ -21,6 +21,7 @@ const VIEW = {
 function Board (options){
   //----  State  -----------------------------------------------------------------
   state = {
+    view: VIEW.question1,
     players: [
       {
         symbol: null,
@@ -227,12 +228,12 @@ function htmlGameEnd (){
   return `<div id='resultView'> ${htmlBefore} <div id="board">${board}</id> ${htmlAfter} </div>`
 }
 
-function render(view){
+function render(){
   // console.log('renderS')
   let html = ''
-  if (view == VIEW.question1) {html = htmlQ1()}
-  else if (view == VIEW.question2) {html = htmlQ2()}
-  else if (view == VIEW.result) {html=htmlGameEnd()}
+  if (state.view == VIEW.question1) {html = htmlQ1()}
+  else if (state.view == VIEW.question2) {html = htmlQ2()}
+  else if (state.view == VIEW.result) {html=htmlGameEnd()}
   else {html=htmlGame()}
   // console.log(html)
   options.el.innerHTML = html
@@ -241,7 +242,8 @@ function render(view){
 
 function question1Handler (ev){
   state.players[1].isComputer = !($(ev.currentTarget).attr('data')==="2players")
-  render(VIEW.question2)
+  state.view = VIEW.question2
+  render()
 }
 
 function question2Handler (ev){
@@ -249,11 +251,12 @@ function question2Handler (ev){
   state.players[0].symbol=player1Symbol;
   state.players[1].symbol=(player1Symbol===SYMBOLS.x)? SYMBOLS.o: SYMBOLS.x;
 
+  state.view = VIEW.game
   initGame()
   if(state.players[state.game.turn].isComputer)
     doComputerMove()
 
-  render(VIEW.game)
+  render()
 }
 
 function doComputerMove (){
@@ -284,7 +287,7 @@ function executeTurn(board, move, symbol) {
   let result = getResult(board).result
 
   if (result === RESULT.incomplete){
-    render(VIEW.game)
+    render()
   } else {
     //Increment score and show result
     if(result !== RESULT.tie) {
@@ -292,7 +295,8 @@ function executeTurn(board, move, symbol) {
       winningPlayer.score++
     }
 
-    render(VIEW.result)
+    state.view = VIEW.result
+    render()
   }
 
   if (state.players[state.game.turn].isComputer){
@@ -302,7 +306,8 @@ function executeTurn(board, move, symbol) {
 
 function beginGame(){
   initGame()
-  render(VIEW.game)
+  state.view = VIEW.game
+  render()
   if(state.game.turn === 1 && state.players[1].isComputer)
     doComputerMove();
 }
@@ -312,7 +317,7 @@ function beginGame(){
   $(options.el).on('click', '#gameView .cell', playerMoveHandler)
   $(options.el).on('click', '#resultView', beginGame)
 
-  render (VIEW.question1)
+  render ()
 }
 
 
