@@ -190,6 +190,10 @@ function Board (options){
       return `<button type="button" class="btn btn-default btnGroup${btnGroup}" data=${data}>${text}</button>`
     }
 
+    function htmlSpaces (times){
+      return '&emsp;'.repeat(times)
+    }
+
     function htmlQ1(){
       return `<div id="view1"><p>Which do you prefer?\n</p>
       ${buttonHTML(1, "1player", "Man Against computer")}
@@ -198,7 +202,7 @@ function Board (options){
     }
 
     function htmlQ2(){
-      const html2=`<div id="view2"><p>${!state.players[1].isComputer? "Player 1 - " : ""}Which symbols would you like to use?</p>
+      const html2=`<div id="view2"><p>${!state.players[1].isComputer? "Player 1, <br />" : ""}Which symbols would you like to use?</p>
       ${buttonHTML(2, "X", "X")}
       ${buttonHTML(2, "O", "O")}`
       return html2
@@ -210,28 +214,42 @@ function Board (options){
       if(!state.players[state.game.turn].isComputer)
         playerName = state.game.turn === 0 ? 'Player1' : 'Player2'
 
-      let htmlBefore = `<p>move: ${moveNumber} &emsp; &ensp; turn: ${playerName}</p>`
+      let htmlBefore = `<p>move: ${moveNumber} ${htmlSpaces(5)} turn: ${playerName}</p>`
       let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
-          return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
+          return acc + `<div id= "row${rowIndex}" class="row">${curr.map((str,colIndex)=>`<div class="cell col${colIndex}" data-row=${rowIndex} data-column=${colIndex}>${str}</div>`).join('')}</div>`
         }, ``)
-      let htmlAfter = `<p>Score: Player 1 - ${state.players[0].score} &emsp; &ensp; Player 2 - ${state.players[1].score}</p>`
+      let htmlAfter = `<p>Score: ${htmlSpaces(1)} Player 1 - ${state.players[0].score} ${htmlSpaces(1)} Player 2 - ${state.players[1].score}</p>`
       return `<div id='gameView'> ${htmlBefore} <div id="board">${board}</div> ${htmlAfter} </div>`
     }
 
 
     function htmlGameEnd (){
-      let {result, winningRow} = getResult(state.game._gameBoard, state.players[state.game.turn].symbol )
+      function arraysAreEqual (arr1, arr2){
+        if(arr1.length !== arr2.length)
+          return false;
+        for(var i = arr1.length; i--;) {
+            if(arr1[i] !== arr2[i])
+                return false;
+        }
+        return true;
+      }
+
+      let {result, winningLine} = getResult(state.game._gameBoard, state.players[state.game.turn].symbol )
 
       let resultText = "tie"
       if(result !== RESULT.tie)
         resultText = getPlayerName(result) + " won"
 
+      console.log(winningLine.some(arr=>arr==[0,0]))
 
-      let htmlBefore = `<p>${resultText} &emsp; &ensp; Click to restart game </p> `
+      let htmlBefore = `<p>${resultText} ${htmlSpaces(6)} Click to restart game </p> `
       let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
-          return acc + `<div class="row">${curr.map((str,itemIndex)=>`<div class="cell" data-row=${rowIndex} data-column=${itemIndex}>${str}</div>`).join('')}</div>`
+          return acc + `<div id="row${rowIndex}" class="row">${curr.map(
+            (str,colIndex)=>
+            `<div class="cell col${colIndex} ${winningLine.some(arr=>(arraysAreEqual(arr,[rowIndex,colIndex]))) ? "winningLine" : ""}"
+              data-row=${rowIndex} data-column=${colIndex}>${str}</div>`).join('')}</div>`
         }, ``)
-      let htmlAfter = `<p>Score: Player 1 - ${state.players[0].score} &emsp; &ensp; Player 2 - ${state.players[1].score}</p>`
+      let htmlAfter = `<p>Score: ${htmlSpaces(1)} Player 1 - ${state.players[0].score} ${htmlSpaces(1)} Player 2 - ${state.players[1].score}</p>`
       return `<div id='resultView'> ${htmlBefore} <div id="board">${board}</id> ${htmlAfter} </div>`
     }
 
@@ -287,7 +305,6 @@ function Board (options){
     }
 
     applyMove(board,move,symbol)
-    state.game.turn = (state.game.turn+1)%2
     let result = getResult(board, symbol).result
 
     if (result === RESULT.incomplete){
@@ -302,7 +319,7 @@ function Board (options){
       state.view = VIEW.result
       render()
     }
-
+    state.game.turn = (state.game.turn+1)%2
     if (result==RESULT.incomplete && state.players[state.game.turn].isComputer){
       doComputerMove()
     }

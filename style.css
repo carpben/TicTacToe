@@ -3,20 +3,24 @@ html, body {
   color: white;
   width: 100%;
   display:flex;
-
 }
 
 #root {
   margin:auto;
 }
 
+#view1, #view2 {
+  text-align: center;
+}
+
 button {
   background-color: white !important;
   color:black !important;
+  margin-top: 1em;
 }
 
 #gameView p, #resultView p  {
-  margin: 1em auto;
+  margin: 1em 2em;
 
 }
 .cell {
@@ -29,4 +33,21 @@ button {
   color: black;
   font-size: 100px;
   text-align: center;
+}
+
+#row0 .col0 {
+  border-top-left-radius: 10px;
+}
+#row0 .col2 {
+  border-top-right-radius: 10px;
+}
+#row2 .col0 {
+  border-bottom-left-radius: 10px;
+}
+#row2 .col2 {
+  border-bottom-right-radius: 10px;
+}
+
+.cell.winningLine {
+  color:green;
 }
