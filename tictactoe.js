@@ -69,7 +69,7 @@ function Board (options){
       }
 
       let line
-      let winningLine
+      let winningLine=[]
 
       //first we check row, then column, then diagonal
       for (var i = 0 ; i<3 ; i++){
@@ -103,14 +103,14 @@ function Board (options){
       line = diag2.join('')
       if(succession(line)){
         result = symbol
-        winningLine = [[2,2], [1,1], [0,0]]
+        winningLine = [[0,2], [1,1], [2,0]]
         return {result, winningLine};
       }
 
       //Check for tie
       if (moveCount(board)==9){
         result=RESULT.tie
-        return {result}
+        return {result, winningLine}
       }
       // for (let row = 0 ; row<board.length ; row++){
       //   for (let column = 0 ; column<board[row].length ; column++){
@@ -123,6 +123,7 @@ function Board (options){
 
       return {result}
     }
+
   function getBestMove (board, symbol){
 
     function copyBoard(board) {
@@ -240,7 +241,6 @@ function Board (options){
       if(result !== RESULT.tie)
         resultText = getPlayerName(result) + " won"
 
-      console.log(winningLine.some(arr=>arr==[0,0]))
 
       let htmlBefore = `<p>${resultText} ${htmlSpaces(6)} Click to restart game </p> `
       let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
