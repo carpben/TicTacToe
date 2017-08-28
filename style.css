@@ -21,8 +21,8 @@ button {
 
 #gameView p, #resultView p  {
   margin: 1em 2em;
-
 }
+
 .cell {
   display: inline-block;
   border: 1px solid black;

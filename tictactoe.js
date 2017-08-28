@@ -149,6 +149,14 @@ function Board (options){
       return availableMoves
     }
 
+    function shuffleArray (array){
+        // shuffles the array in place
+        for (var i = array.length - 1; i > 0; i--) {
+            var rand = Math.floor(Math.random() * (i + 1));
+            [array[i], array[rand]]=[array[rand], array[i]]
+        }
+    }
+
     let availableMoves = getAvailableMoves(board)
 
     let availableMovesAndScores = []
@@ -172,6 +180,8 @@ function Board (options){
         return {move, score}
       availableMovesAndScores.push({move, score})
     }
+
+    shuffleArray(availableMovesAndScores)
 
     availableMovesAndScores.sort((moveA, moveB )=>{
         return moveB.score - moveA.score
