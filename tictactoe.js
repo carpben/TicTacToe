@@ -9,7 +9,6 @@ const RESULT = {
   tie: 3
 }
 const VIEW = {
-    intro:0,
   question1: 1,
   question2: 2,
   game: 3,
@@ -18,7 +17,7 @@ const VIEW = {
 
 function Board (options){
   state = {
-    view: VIEW.intro,
+    view: VIEW.question1,
     players: [
       {
         symbol: null,
@@ -59,16 +58,16 @@ function Board (options){
 
   function getResult(board,symbol){
       // returns an object with the RESULT and an array of the winning line
-      function succession (line){
-        return (line === symbol.repeat(3))
-      }
 
       let result = RESULT.incomplete
       if (moveCount(board)<5){
         {result}
       }
 
-      const otherSymbol = symbol==='X'? 'O' : 'X';
+      function succession (line){
+        return (line === symbol.repeat(3))
+      }
+
       let line
       let winningLine=[]
 
@@ -76,7 +75,7 @@ function Board (options){
       for (var i = 0 ; i<3 ; i++){
         line = board[i].join('')
         if(succession(line)){
-            result = otherSymbol
+          result = symbol;
           winningLine = [[i,0], [i,1], [i,2]]
           return {result, winningLine};
         }
@@ -86,7 +85,7 @@ function Board (options){
         let column = [board[0][j],board[1][j],board[2][j]]
         line = column.join('')
         if(succession(line)){
-            result = otherSymbol
+          result = symbol
           winningLine = [[0,j], [1,j], [2,j]]
           return {result, winningLine};
         }
@@ -95,7 +94,7 @@ function Board (options){
       let diag1 = [board[0][0],board[1][1],board[2][2]]
       line = diag1.join('')
       if(succession(line)){
-        result = otherSymbol
+        result = symbol
         winningLine = [[0,0], [1,1], [2,2]]
         return {result, winningLine};
       }
@@ -103,14 +102,14 @@ function Board (options){
       let diag2 = [board[0][2],board[1][1],board[2][0]]
       line = diag2.join('')
       if(succession(line)){
-        result = otherSymbol
+        result = symbol
         winningLine = [[0,2], [1,1], [2,0]]
         return {result, winningLine};
       }
 
       //Check for tie
       if (moveCount(board)==9){
-        result=symbol
+        result=RESULT.tie
         return {result, winningLine}
       }
       // for (let row = 0 ; row<board.length ; row++){
@@ -158,9 +157,8 @@ function Board (options){
         }
     }
 
-    const otherSymbol = symbol==='X'? 'O' : 'X';
-
     let availableMoves = getAvailableMoves(board)
+
     let availableMovesAndScores = []
 
     for (var i=0 ; i<availableMoves.length ; i++){
@@ -169,14 +167,12 @@ function Board (options){
       newBoard = applyMove(newBoard,move, symbol)
       result = getResult(newBoard,symbol).result
       let score
-      if (result == otherSymbol) {
-        score = -1
-      }
+      if (result == RESULT.tie) {score = 0}
       else if (result == symbol) {
-        score=1
+        score = 1
       }
       else {
-        // let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
+        let otherSymbol = (symbol==SYMBOLS.x)? SYMBOLS.o : SYMBOLS.x
         nextMove = getBestMove(newBoard, otherSymbol)
         score = - (nextMove.score)
       }
@@ -209,12 +205,6 @@ function Board (options){
       return '&emsp;'.repeat(times)
     }
 
-    function htmlintro(){
-        return `<div id="intro"><h1>Welcome to Reverse Tic Tac Toe <small>(AKA Eot Cat Cit)</small></h1>
-        <h3> The player that makes a line loses. If there are no lines and the board is full the first player wins</h3>
-        <h3>Click any button to continue</h3></div>`
-    }
-
     function htmlQ1(){
       return `<div id="view1"><p>Which do you prefer?\n</p>
       ${buttonHTML(1, "1player", "Man Against computer")}
@@ -232,11 +222,10 @@ function Board (options){
     function htmlGame (){
       const moveNumber = moveCount(state.game._gameBoard) + 1
       let playerName = 'Computer'
-
       if(!state.players[state.game.turn].isComputer)
         playerName = state.game.turn === 0 ? 'Player1' : 'Player2'
 
-      let htmlBefore = `<h3>move: ${moveNumber} ${htmlSpaces(5)} turn: ${playerName}</h3>`
+      let htmlBefore = `<p>move: ${moveNumber} ${htmlSpaces(5)} turn: ${playerName}</p>`
       let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
           return acc + `<div id= "row${rowIndex}" class="row">${curr.map((str,colIndex)=>`<div class="cell col${colIndex}" data-row=${rowIndex} data-column=${colIndex}>${str}</div>`).join('')}</div>`
         }, ``)
@@ -263,7 +252,7 @@ function Board (options){
         resultText = getPlayerName(result) + " won"
 
 
-      let htmlBefore = `<h3>${resultText} ${htmlSpaces(6)} Click to restart game </h3> `
+      let htmlBefore = `<p>${resultText} ${htmlSpaces(6)} Click to restart game </p> `
       let board = state.game._gameBoard.reduce(function(acc,curr,rowIndex){
           return acc + `<div id="row${rowIndex}" class="row">${curr.map(
             (str,colIndex)=>
@@ -275,18 +264,12 @@ function Board (options){
     }
 
     let html = ''
-    if (state.view == VIEW.intro) {html=htmlintro()}
-    else if (state.view == VIEW.question1) {html = htmlQ1()}
+    if (state.view == VIEW.question1) {html = htmlQ1()}
     else if (state.view == VIEW.question2) {html = htmlQ2()}
     else if (state.view == VIEW.result) {html=htmlGameEnd()}
     else {html=htmlGame()}
     // console.log(html)
     options.el.innerHTML = html
-  }
-
-  function introHnadler (ev){
-      state.view = VIEW.question1
-      render()
   }
 
   function question1Handler (ev){
@@ -360,7 +343,6 @@ function Board (options){
       doComputerMove();
   }
 
-  $(options.el).on('click', '#intro', introHnadler)
   $(options.el).on('click', '.btnGroup1', question1Handler)
   $(options.el).on('click', '.btnGroup2', question2Handler)
   $(options.el).on('click', '#gameView .cell', playerMoveHandler)
