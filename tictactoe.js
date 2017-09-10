@@ -1,3 +1,8 @@
+/* Play Tic Toe, against a friend or the computer.
+If u choose to play against the computer, the 'Computer Player' will use the getBestMove function to choose one of the best possible moves.
+*/
+
+// -- Constants --
 const SYMBOLS = {
   x:'X',
   o:'O'
@@ -16,6 +21,9 @@ const VIEW = {
 }
 
 function Board (options){
+  // Creates the board Object for the game
+
+  // -- Data Stracture --
   state = {
     view: VIEW.question1,
     players: [
@@ -44,7 +52,7 @@ function Board (options){
   }
 
   function moveCount(board){
-    //receives a board and returns
+    //receives a board and returns the number of moves that have been played.
     let moveCount = 0
     for (let i = 0; i<board.length; i++){
       for (let j = 0 ; j<board[i].length ; j++){
@@ -57,8 +65,7 @@ function Board (options){
   }
 
   function getResult(board,symbol){
-      // returns an object with the RESULT and an array of the winning line
-
+      // receives a board, and the symbol of the player and returns an object with the result and an array of the winning line
       let result = RESULT.incomplete
       if (moveCount(board)<5){
         {result}
@@ -112,20 +119,12 @@ function Board (options){
         result=RESULT.tie
         return {result, winningLine}
       }
-      // for (let row = 0 ; row<board.length ; row++){
-      //   for (let column = 0 ; column<board[row].length ; column++){
-      //     if (board[row][column]==""){
-      //       result = RESULT.incomplete
-      //       break;
-      //     }
-      //   }
-      // }
 
       return {result}
     }
 
   function getBestMove (board, symbol){
-
+    // Receives a board, and the symbol of the player who has the next move. Returns the cordinates of the move and a score for that move (1-for winning, 0 for tie, and -1 for losing)
     function copyBoard(board) {
       let copy = []
        for (let row = 0 ; row<3 ; row++){
@@ -138,6 +137,7 @@ function Board (options){
     }
 
     function getAvailableMoves (board) {
+      // Receives a board, and returns an array of available moves.
       let availableMoves = []
       for (let row = 0 ; row<3 ; row++){
         for (let column = 0 ; column<3 ; column++){
@@ -158,10 +158,10 @@ function Board (options){
     }
 
     let availableMoves = getAvailableMoves(board)
-
     let availableMovesAndScores = []
 
     for (var i=0 ; i<availableMoves.length ; i++){
+      // Iterates over each available move. If it finds a winning move it returns it immediately. Otherwise it pushes a move and a score to the availableMovesAndScores array.
       let move = availableMoves[i]
       let newBoard = copyBoard(board)
       newBoard = applyMove(newBoard,move, symbol)
@@ -190,6 +190,7 @@ function Board (options){
   }
 
   function render(){
+    // Renders the screen according to the state.
     function getPlayerName(playerSymbol){
       if(playerSymbol === state.players[0].symbol)
         return state.players[0].isComputer ? 'Computer' : "Player1"
