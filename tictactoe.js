@@ -68,7 +68,7 @@ function Board (options){
       // receives a board, and the symbol of the player and returns an object with the result and an array of the winning line
       let result = RESULT.incomplete
       if (moveCount(board)<5){
-        {result}
+         return {result}
       }
 
       function succession (line){
